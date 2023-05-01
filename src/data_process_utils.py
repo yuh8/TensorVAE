@@ -72,7 +72,8 @@ def get_edge_feature(mol, source_idx, sink_idx, kind, max_neighbor_len):
         stereo_idx = BOND_STEREO_NAMES.index(stereo_name)
 
         # ring size
-        ring_indices = [idx + 1 for idx, size in enumerate(RING_SIZES) if bond.IsInRingSize(size)]
+        ring_indices = [idx + 1 for idx,
+                        size in enumerate(RING_SIZES) if bond.IsInRingSize(size)]
         if len(ring_indices) == 0:
             ring_indices = [0]
 
@@ -93,48 +94,40 @@ def get_edge_feature(mol, source_idx, sink_idx, kind, max_neighbor_len):
     return bond_channel_feature, dist
 
 
-def mol_to_tensor(mol):
+def mol_to_tensor(mol, infer=False):
     smi_graph = np.zeros((MAX_NUM_ATOMS, MAX_NUM_ATOMS, FEATURE_DEPTH + 4))
     R = np.zeros((MAX_NUM_ATOMS, 3))
     conf = mol.GetConformer(0)
     graph, max_neighbor_len = mol_to_extended_graph(mol)
+    dfs_nodes = list(graph.nodes)
 
-    for atom in mol.GetAtoms():
-        atom_idx = atom.GetIdx()
-        node_feature = get_node_feature(mol, atom_idx)
-        smi_graph[atom_idx, atom_idx, :len(node_feature)] = node_feature
-        smi_graph[atom_idx, atom_idx, -3:] = conf.GetAtomPosition(atom_idx)
-        R[atom_idx, :] = conf.GetAtomPosition(atom_idx)
+    for new_idx, node in enumerate(graph.nodes):
+        node_feature = get_node_feature(mol, node)
+        smi_graph[new_idx, new_idx, :len(node_feature)] = node_feature
+        smi_graph[new_idx, new_idx, -3:] = conf.GetAtomPosition(node)
+        R[new_idx, :] = conf.GetAtomPosition(node)
 
     for (source_idx, sink_idx) in graph.edges:
         kind = graph.edges[(source_idx, sink_idx)]['kind']
-        edge_feature, dist = get_edge_feature(mol, source_idx, sink_idx, kind, max_neighbor_len)
-        node_feature = get_node_feature(mol, source_idx) + get_node_feature(mol, sink_idx)
-        smi_graph[source_idx, sink_idx, :len(node_feature)] = node_feature
-        smi_graph[sink_idx, source_idx, :len(node_feature)] = node_feature
+        edge_feature, dist = get_edge_feature(
+            mol, source_idx, sink_idx, kind, max_neighbor_len)
+        node_feature = get_node_feature(
+            mol, source_idx) + get_node_feature(mol, sink_idx)
+        new_source_idx = dfs_nodes.index(source_idx)
+        new_sink_idx = dfs_nodes.index(sink_idx)
+        smi_graph[new_source_idx, new_sink_idx,
+                  :len(node_feature)] = node_feature
+        smi_graph[new_sink_idx, new_source_idx,
+                  :len(node_feature)] = node_feature
 
-        smi_graph[source_idx, sink_idx, len(node_feature):-4] = edge_feature
-        smi_graph[sink_idx, source_idx, len(node_feature):-4] = edge_feature
-        smi_graph[source_idx, sink_idx, -4] = dist
-        smi_graph[sink_idx, source_idx, -4] = dist
+        smi_graph[new_source_idx, new_sink_idx,
+                  len(node_feature):-4] = edge_feature
+        smi_graph[new_sink_idx, new_source_idx,
+                  len(node_feature):-4] = edge_feature
+        smi_graph[new_source_idx, new_sink_idx, -4] = dist
+        smi_graph[new_sink_idx, new_source_idx, -4] = dist
+
+    if infer:
+        return smi_graph, list(graph.nodes)
 
     return smi_graph, R
-
-
-def mol_to_d_dist(conf_df):
-    dist_kind = {}
-    for i in range(200):
-        dist_kind[i] = []
-
-    for _, mol_row in conf_df.iterrows():
-        mol = mol_row.rd_mol
-        graph, max_neighbor_len = mol_to_extended_graph(mol)
-
-        for (source_idx, sink_idx) in graph.edges:
-            kind = graph.edges[(source_idx, sink_idx)]['kind']
-            if source_idx == 0:
-                dist_list = dist_kind[kind]
-                _, dist = get_edge_feature(mol, source_idx, sink_idx, kind, max_neighbor_len)
-                dist_list.append(dist)
-                dist_kind[kind] = dist_list
-    return dist_kind

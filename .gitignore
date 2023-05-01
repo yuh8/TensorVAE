@@ -1,3 +1,4 @@
+checkpoints*/
 *.png
 __pycache__/
 logs*/
@@ -9,3 +10,6 @@ logs*/
 *.pkl
 *.csv
 *samples/
+*.log
+psi*
+.vscode

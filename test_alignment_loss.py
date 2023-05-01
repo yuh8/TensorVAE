@@ -6,15 +6,16 @@ from rdkit.Chem.rdMolAlign import GetAlignmentTransform
 from src.misc_utils import pickle_load, kabsch_fit, kabsch_rmsd
 
 
-test_path = '/mnt/transvae/test_data/test_batch/smiles.pkl'
-drugs_file = "/mnt/rdkit_folder/summary_drugs.json"
+test_path = '/mnt/raw_data/tensorvae/test_data/test_batch/smiles.pkl'
+drugs_file = "/mnt/raw_data/rdkit_folder/summary_drugs.json"
 with open(drugs_file, "r") as f:
     drugs_summ = json.load(f)
 
 smiles = pickle_load(test_path)
 for smi in smiles[:200]:
     try:
-        mol_path = "/mnt/rdkit_folder/" + drugs_summ[smi]['pickle_path']
+        mol_path = "/mnt/raw_data/rdkit_folder/" + \
+            drugs_summ[smi]['pickle_path']
         with open(mol_path, "rb") as f:
             mol_dict = pickle.load(f)
     except:
@@ -38,8 +39,10 @@ for smi in smiles[:200]:
     for i in range(3):
         rmsd[i], Rot = GetAlignmentTransform(mol_prob[i], mol_ref[i])
         num_atoms = mol_prob[i].GetNumAtoms()
-        conf_prob[i][:num_atoms, ...] = mol_prob[i].GetConformer(0).GetPositions()
-        conf_ref[i][:num_atoms, ...] = mol_ref[i].GetConformer(0).GetPositions()
+        conf_prob[i][:num_atoms, ...] = mol_prob[i].GetConformer(
+            0).GetPositions()
+        conf_ref[i][:num_atoms, ...] = mol_ref[i].GetConformer(
+            0).GetPositions()
         mask[i][num_atoms:] = 0
 
     rmsd_pred = kabsch_rmsd(conf_prob, conf_ref, mask)
