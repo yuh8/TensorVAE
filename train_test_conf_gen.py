@@ -235,14 +235,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--train', type=bool, default=True)
     parser.add_argument('--train_path', type=str,
-                        default='/mnt/raw_data/transvae/train_data/train_batch/')
+                        default='/mnt/raw_data/transvae_qm9/train_data/train_batch/')
     parser.add_argument('--val_path', type=str,
-                        default='/mnt/raw_data/transvae/test_data/val_batch/')
+                        default='/mnt/raw_data/transvae_qm9/test_data/val_batch/')
     parser.add_argument('--test_path', type=str,
-                        default='/mnt/raw_data/transvae/test_data/test_batch/')
+                        default='/mnt/raw_data/transvae_qm9/test_data/test_batch/')
     parser.add_argument('--ckpt_path', type=str,
-                        default='checkpoints/TensorVAE_1M_random/')
-    parser.add_argument('--logdir', type=str, default='./logs')
+                        default='checkpoints/TensorVAE_qm9_1M_random/')
+    parser.add_argument('--logdir', type=str, default='./logs_qm9')
     args = parser.parse_args()
 
     ckpt_path = args.ckpt_path
@@ -333,8 +333,8 @@ if __name__ == "__main__":
 
     # save trained model
     g_net.compile(optimizer='SGD', loss=None)
-    g_net.save('g_net/' + 'GNet')
+    g_net.save('g_net_qm9/' + 'GNet')
     gdr_net.compile(optimizer='adam', loss=None)
-    gdr_net.save('gr_net/' + 'GDRNet')
+    gdr_net.save('gr_net_qm9/' + 'GDRNet')
     dec_net.compile(optimizer='adam', loss=None)
-    dec_net.save('dec_net/' + 'DecNet')
+    dec_net.save('dec_net_qm9/' + 'DecNet')

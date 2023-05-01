@@ -15,8 +15,9 @@ RING_SIZES = range(3, 10)
 
 
 # Atom features
-MAX_NUM_ATOMS = 69
-ATOM_LIST = ['H', 'C', 'N', 'O', 'F', 'S', 'Cl', 'Br', 'P', 'I', 'Na', 'B', 'Si', 'Se', 'K', 'Bi']
+MAX_NUM_ATOMS = 30
+ATOM_LIST = ['H', 'C', 'N', 'O', 'F', 'S', 'Cl',
+             'Br', 'P', 'I', 'Na', 'B', 'Si', 'Se', 'K', 'Bi']
 CHARGES = [-2, -1, 0, 1, 2, 3]
 
 CHIR_DICT = Chem.rdchem.ChiralType.values
@@ -45,4 +46,3 @@ MIN_KL_WEIGHT = 1e-4
 MAX_KL_WEIGHT = 0.0256
 MAX_EPOCH = 640
 Q_PERIOD = 40  # 12496
-CYCLE_PERIOD = 19525

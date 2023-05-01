@@ -11,15 +11,15 @@ from src.CONSTS import NUM_CONFS_PER_MOL
 
 
 def get_train_val_test_smiles():
-    drugs_file = raw_data_path + "/rdkit_folder/summary_drugs.json"
+    drugs_file = raw_data_path + "/rdkit_folder/summary_qm9.json"
     with open(drugs_file, "r") as f:
         drugs_summ = json.load(f)
 
     all_simles = list(drugs_summ.keys())
     np.random.shuffle(all_simles)
-    create_folder(raw_data_path + '/tensorvae/train_data/train_batch/')
-    create_folder(raw_data_path + '/tensorvae/test_data/test_batch/')
-    create_folder(raw_data_path + '/tensorvae/test_data/val_batch/')
+    create_folder(raw_data_path + '/tensorvae_qm9/train_data/train_batch/')
+    create_folder(raw_data_path + '/tensorvae_qm9/test_data/test_batch/')
+    create_folder(raw_data_path + '/tensorvae_qm9/test_data/val_batch/')
 
     # train, val, test split
     smiles_train, smiles_test \
@@ -29,15 +29,15 @@ def get_train_val_test_smiles():
         = train_test_split(smiles_train, test_size=0.1, random_state=43)
 
     pickle_save(
-        smiles_train, raw_data_path + '/tensorvae/train_data/train_batch/smiles.pkl')
+        smiles_train, raw_data_path + '/tensorvae_qm9/train_data/train_batch/smiles.pkl')
     pickle_save(
-        smiles_test, raw_data_path + '/tensorvae/test_data/test_batch/smiles.pkl')
+        smiles_test, raw_data_path + '/tensorvae_qm9/test_data/test_batch/smiles.pkl')
     pickle_save(
-        smiles_val, raw_data_path + '/tensorvae/test_data/val_batch/smiles.pkl')
+        smiles_val, raw_data_path + '/tensorvae_qm9/test_data/val_batch/smiles.pkl')
 
 
 def get_and_save_data_batch(smiles_path, dest_data_path, batch_num=200000):
-    drugs_file = raw_data_path + "/rdkit_folder/summary_drugs.json"
+    drugs_file = raw_data_path + "/rdkit_folder/summary_qm9.json"
     with open(drugs_file, "r") as f:
         drugs_summ = json.load(f)
 
@@ -81,52 +81,8 @@ def get_and_save_data_batch(smiles_path, dest_data_path, batch_num=200000):
         break
 
 
-def get_num_atoms_dist():
-    '''
-    select number of atoms to be 69.
-    check percentage of mols with num of atoms > 69 and
-    50 < num_confs < 100
-    '''
-    drugs_file = raw_data_path + "/rdkit_folder/summary_drugs.json"
-    with open(drugs_file, "r") as f:
-        drugs_summ = json.load(f)
-
-    all_simles = list(drugs_summ.keys())
-    num_atoms = []
-    cnt_out_of_dist_smi = 0
-    for idx, smi in enumerate(all_simles):
-        try:
-            mol_path = raw_data_path + "/rdkit_folder/" + \
-                drugs_summ[smi]['pickle_path']
-            with open(mol_path, "rb") as f:
-                mol_dict = pickle.load(f)
-        except Exception as e:
-            print(e)
-            continue
-
-        conf_df = pd.DataFrame(mol_dict['conformers'])
-        conf_df.sort_values(by=['boltzmannweight'],
-                            ascending=False, inplace=True)
-        num_confs = conf_df.shape[0]
-        if num_confs < 1:
-            continue
-        num_atoms.append(conf_df.iloc[0].rd_mol.GetNumAtoms())
-
-        if conf_df.iloc[0].rd_mol.GetNumAtoms() > 69:
-            if num_confs > 50 and num_confs < 100:
-                cnt_out_of_dist_smi += 1
-
-        if len(num_atoms) % 1000 == 0:
-            pct_98 = np.percentile(num_atoms, 98)
-            pct_out_of_dist = np.round(cnt_out_of_dist_smi / idx, 4)
-            print("{0}/{1} done with 98 pct {2}".format(idx,
-                  len(all_simles), pct_98))
-            print("{0}/{1} done with num of smis out of distribution pct {2}".format(idx,
-                  len(all_simles), pct_out_of_dist))
-
-
 def get_num_of_disconnected_graphs():
-    drugs_file = raw_data_path + "/rdkit_folder/summary_drugs.json"
+    drugs_file = raw_data_path + "/rdkit_folder/summary_qm9.json"
     with open(drugs_file, "r") as f:
         drugs_summ = json.load(f)
 
@@ -167,11 +123,10 @@ if __name__ == "__main__":
 
     raw_data_path = args.raw_data_path
     get_num_of_disconnected_graphs()
-    get_num_atoms_dist()
     get_train_val_test_smiles()
-    get_and_save_data_batch(raw_data_path + '/tensorvae/train_data/train_batch/smiles.pkl',
-                            raw_data_path + '/tensorvae/train_data/train_batch/')
-    get_and_save_data_batch(raw_data_path + '/tensorvae/test_data/val_batch/smiles.pkl',
-                            raw_data_path + '/tensorvae/test_data/val_batch/', batch_num=2500)
-    get_and_save_data_batch(raw_data_path + '/tensorvae/test_data/test_batch/smiles.pkl',
-                            raw_data_path + '/tensorvae/test_data/test_batch/', batch_num=20000)
+    get_and_save_data_batch(raw_data_path + '/tensorvae_qm9/train_data/train_batch/smiles.pkl',
+                            raw_data_path + '/tensorvae_qm9/train_data/train_batch/')
+    get_and_save_data_batch(raw_data_path + '/tensorvae_qm9/test_data/val_batch/smiles.pkl',
+                            raw_data_path + '/tensorvae_qm9/test_data/val_batch/', batch_num=2500)
+    get_and_save_data_batch(raw_data_path + '/tensorvae_qm9/test_data/test_batch/smiles.pkl',
+                            raw_data_path + '/tensorvae_qm9/test_data/test_batch/', batch_num=20000)

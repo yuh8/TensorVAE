@@ -260,6 +260,6 @@ def compute_cov_mat(smiles_path, g_net, decoder_net):
 if __name__ == "__main__":
     freeze_support()
     g_net, decoder_net, _ = load_models()
-    test_path = '/mnt/raw_data/transvae/test_data/test_batch/'
+    test_path = '/mnt/raw_data/transvae_qm9/test_data/test_batch/'
     compute_cov_mat(test_path + 'smiles.pkl', g_net, decoder_net)
     get_conformation_samples(test_path, g_net, decoder_net)
