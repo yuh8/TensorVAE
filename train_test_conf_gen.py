@@ -285,6 +285,7 @@ if __name__ == "__main__":
         transvae.load_weights(ckpt_path)
     except:
         print('no exitsing model detected, training starts afresh')
+        args.train = 'true'
         pass
 
     if args.train == 'true':
