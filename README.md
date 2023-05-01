@@ -25,7 +25,13 @@ The train, validation, test smiles for reproducing the *Drugs* conformation gene
 
 There are two branchs: **main** for Drugs experiments and **QM9** for qm9 experiments
 
-please download the geom dataset and provide your local path to the ```train_test_conf_gen.py``` function
+Please download the geom dataset into a raw_data_path and generate data using
+
+```
+python data_gen.py --raw_data_path your/raw_data/path
+```
+
+Provide your local train, val and test path to the ```train_test_conf_gen.py``` function
 
 ```
 python train_test_conf.py --train_path [your/train/path] --val_path [your/val/path] --test_path [your/test/path] 
