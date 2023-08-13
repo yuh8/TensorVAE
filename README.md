@@ -18,7 +18,7 @@ The official GEOM dataset is accessible from [here](https://github.com/learningm
 
 The qm9 molecular property prediction data is available [here](https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/qm9.csv) and [here](https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/gdb9.tar.gz)
 
-The train, validation, test smiles for reproducing the *Drugs* conformation generation experiment is available [here](https://www.dropbox.com/sh/v7gcvqoyvgpckum/AAAKR7jsYIF08uu7IkotNJLla?dl=0)
+The train, validation, test smiles for reproducing the *Drugs* conformation generation experiment will be available upon acceptance of the paper.
 
 ## Training and testing
 **Conformation generation**
@@ -41,7 +41,7 @@ the hyper-parameter setting is available in the ```src.CONSTS.py``` file. Please
 
 ![alt text](https://github.com/yuh8/TensorVAE/blob/main/assets/Train_Val%20curve.png)
 
-For testing, the checkpoints for Drugs experiments are available [here](https://www.dropbox.com/sh/qomlvaq5oplsxvd/AABmTNRPlZ2W_djaRwkDK41Ma?dl=0). Please download and place them in the ./checkpoints/ folder and run
+For testing, the checkpoints for Drugs experiments will be available upon the acceptance of the paper. Please download and place them in the ./checkpoints/ folder and run
 
 ```
 python train_test_conf.py --train false --test_path [your/test/path] 
